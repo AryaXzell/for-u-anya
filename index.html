@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>for anya.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fdf5f2; /* creamy pink */
+            --text-color: #6d5d5d;
+            --accent-color: #d4a373;
+            --transition-speed: 1.5s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* initial tap screen */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            cursor: pointer;
+            transition: opacity var(--transition-speed) ease;
+        }
+
+        #overlay p {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            opacity: 0.6;
+            animation: breathe 2s infinite alternate;
+        }
+
+        /* main content container */
+        #main-content {
+            opacity: 0;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            padding: 40px 20px;
+            transition: opacity var(--transition-speed) ease;
+            visibility: hidden;
+        }
+
+        .fade-in {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        section {
+            margin-bottom: 80px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        .intro-text {
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        /* IMAGE STYLES & PROTECTION */
+        .decorative-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 2px;
+            filter: sepia(20%) contrast(90%);
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            
+            /* Disable drag and long-press on mobile */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .message {
+            line-height: 1.8;
+            font-size: 0.95rem;
+            font-weight: 300;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin-top: 20px;
+        }
+
+        .subtext {
+            font-size: 0.85rem;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+
+        .footer {
+            margin-top: 100px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            padding-bottom: 40px;
+        }
+
+        /* subtle sparkle effect */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        @keyframes breathe {
+            from { opacity: 0.3; }
+            to { opacity: 0.7; }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .hero-title { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <p>tap anywhere</p>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <div id="main-content">
+        <section>
+            <p class="intro-text">hi anya, today is april 8.</p>
+            <img src="https://owivtazpjnkbncfwmitk.supabase.co/storage/v1/object/public/media/ef9f83b8-133b-4f60-ab6d-cddd5d848829.jpg" alt="aesthetic flowers" class="decorative-img">
+            <div class="message">
+                сегодняшний день — напоминание о том, как прекрасен мир благодаря твоему присутствию. <br>
+                спасибо за твою искренность и те простые вещи, <br>
+                которыми ты так открыто делишься.
+            </div>
+        </section>
+
+        <section>
+            <h1 class="hero-title">Happy Birthday, Anya</h1>
+            <p class="subtext">may your days ahead be as calm and kind as you are.</p>
+        </section>
+
+        <section class="footer">
+            <p>enjoy your special day.</p>
+            <p style="margin-top: 10px;">—</p>
+        </section>
+    </div>
+
+    <audio id="bg-music" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const overlay = document.getElementById('overlay');
+        const mainContent = document.getElementById('main-content');
+        const music = document.getElementById('bg-music');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Disable right-click specifically on images
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.nodeName === 'IMG') {
+                e.preventDefault();
+            }
+        }, false);
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        overlay.addEventListener('click', () => {
+            // start music with fade in volume
+            music.volume = 0;
+            music.play().catch(error => console.log("Music play failed, likely browser restriction:", error));
+            let vol = 0;
+            const interval = setInterval(() => {
+                if (vol < 0.3) {
+                    vol += 0.05;
+                    music.volume = vol;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 200);
+
+            // fade out overlay and show content
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                mainContent.classList.add('fade-in');
+                startSparkles();
+            }, 1500);
+
+            // music fade out after 2 minutes
+            setTimeout(() => {
+                let fadeOutInterval = setInterval(() => {
+                    if (music.volume > 0.02) {
+                        music.volume -= 0.01;
+                    } else {
+                        music.pause();
+                        clearInterval(fadeOutInterval);
+                    }
+                }, 500);
+            }, 120000); 
+        });
+
+        // minimal sparkle effect
+        let particles = [];
+        function startSparkles() {
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speed: Math.random() * 0.5 + 0.1,
+                    opacity: Math.random()
+                });
+            }
+            animate();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(212, 163, 115, 0.5)';
+            
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                p.y -= p.speed;
+                if (p.y < 0) p.y = canvas.height;
+            });
+            requestAnimationFrame(animate);
+        }
+    </script>
+</body>
+</html>
